@@ -142,7 +142,7 @@
     <div id="map"></div>
 
     <script>
-      
+
       // This example requires the Places library. Include the libraries=places
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
@@ -257,24 +257,21 @@
           console.log(response.toString());
           if (status === 'OK') {
             directionsDisplay.addListener('directions_changed', function() {
-              console.log(directionsDisplay.getDirections().routes[0].legs[0].steps);
+              var distance = [];
+              var instruction = [];
+              var length = directionsDisplay.getDirections().routes[0].legs[0].steps.length;
+              for(var i = 0; i < length; i++) {
+                distance.push(directionsDisplay.getDirections().routes[0].legs[0].steps[i].distance.text);
+                instruction.push(directionsDisplay.getDirections().routes[0].legs[0].steps[i].instructions);
+              }
+              for(var i = 0; i < distance.length; i++) {
+                console.log(instruction[i] + ': ' + distance[i] + '\n');
+              }
             });
-            
             directionsDisplay.setDirections(response);
           } 
         });
       }
-
-      function computeTotalDistance(result) {
-  var total = 0;
-  var myroute = result.routes[0];
-  for (var i = 0; i < myroute.legs.length; i++) {
-    total += myroute.legs[i].distance.value;
-  }
-  total = total / 1000;
-  document.getElementById('right-panel').innerHTML = total + ' km';
-}
-
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiWS-k2v0QtmRIQg6cJsFJ0SkLtKjgFjo&libraries=places&callback=initMap"
         async defer></script>
