@@ -264,9 +264,57 @@
                 distance.push(directionsDisplay.getDirections().routes[0].legs[0].steps[i].distance.text);
                 instruction.push(directionsDisplay.getDirections().routes[0].legs[0].steps[i].instructions);
               }
+              var words = '';
               for(var i = 0; i < distance.length; i++) {
-                console.log(instruction[i] + ': ' + distance[i] + '\n');
+                words = words + instruction[i] + ': ' + distance[i] + '\n';
               }
+
+
+              var text = null;
+              makeTextFile = function (text) {
+                var data = new Blob([text], {type: 'text/plain'});
+                var myReader = new FileReader(); 
+                myReader.readAsText(data);
+                myReader.onload = function(e) {
+                  var rawLog = myReader.result;
+                  var result = rawLog.match(/<b>(.*?)<\/b>/g).map(function(val){
+                      return val.replace(/<\/?b>/g,'');
+                  });
+                  var final_results = [];
+                  for(var i = 0; i < result.length; i++) {
+                    if(result[i] == 'east' || result[i] == 'north' || result[i] == 'north'
+                      || result[i] == 'south' || result[i] == 'left' || result[i] == 'right') {
+                      final_results.push(result[i]);
+                    }
+                  }
+                  var distances = [];
+                  while(rawLog.length > 0) {
+                    if(rawLog.indexOf(':') != -1) {
+                      var newRawLog = rawLog.substring(rawLog.indexOf('>: ') + 3);
+                      var num = newRawLog.substring(0, newRawLog.indexOf(' ') + 3);
+                      distances.push(num);
+                      rawLog = newRawLog.substring(2);
+                    } else {
+                      rawLog = '';
+                    }
+                  }
+                  console.log(final_results);
+                  console.log(distances);
+                  var finalText = '';
+                  for(var i = 0; i < final_results.length; i++) {
+                    finalText = finalText + final_results[i] + ': ' + distances[i] + '\n';
+                  }
+                  console.log(finalText);
+                  var file = new File([finalText], "data.txt", {
+                    type: "text/plain",
+                  });
+                  myReader.readAsText(file);
+                  console.log(file);
+                  return file;
+                };
+              };
+              text = makeTextFile(words);
+              
             });
             directionsDisplay.setDirections(response);
           } 
